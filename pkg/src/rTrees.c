@@ -187,9 +187,9 @@ void rTree(double *x, unsigned long int *xref, int xrow, int xcol,  int nsample,
 
 void SDGainSplit (double *x, unsigned long int *xref, int xrow, int xcol, int ndStart, int ndEnd, int *splitAtt, double *splitPoint, double *ulim, double *llim, int *ndEndl, bool *AttSkip)
 {
-   double attMax, attMin, attSplitPoint, attMaxGain=0, maxGain,  baseSd, leftSd, rightSd,  Gain, base;
-   long double baseOldM, baseOldQ, leftOldM, leftOldQ,  rightOldM, rightOldQ,baseNewM, baseNewQ, leftNewM, leftNewQ,  rightNewM, rightNewQ,xvalue;
-   int n, sAtt, maxGainN;
+   double attMax, attMin, attSplitPoint=0.0, attMaxGain=0.0, maxGain=0.0,  baseSd, leftSd, rightSd,  Gain, base;
+   long double baseOldM=0.0, baseOldQ=0.0, leftOldM=0.0, leftOldQ=0.0,  rightOldM=0.0, rightOldQ=0.0,baseNewM=0.0, baseNewQ=0.0, leftNewM, leftNewQ,  rightNewM, rightNewQ,xvalue;
+   int n, sAtt, maxGainN=0;
    bool FirstRun = true;
 
 

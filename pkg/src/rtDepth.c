@@ -57,8 +57,8 @@ void trvTree(double *x, int xrow, int xcol, int hlim,
              int *rDaughter, int  *splitAtt, double *splitPoint,
              double *ulim, double *llim, int *nSam, int appRange, double *totDepth, int *isoby, double *isoat)
 {
-  int i, k, d,p,j, sAtt=0;
-  double sVal, lastSplitPoint;
+  int i, k, d,p, sAtt=0;
+  double sVal, lastSplitPoint=0.0;
   bool inRange;
 
   for ( i = 0 ;i < xrow; ++i)  {
