@@ -31,7 +31,11 @@
 
 void rTrees(double *x, int *xrow, int *xcol, int *nrnodes, int *ntree, int *hlim, int *rowSamp, int *nRowSamp, int *colSamp, int *nColSamp, int *nmin, double *rFactor, double *colWeight, int *nodeStatus, int *lDaughter, int *rDaughter, int  *splitAtt, double *splitPoint, double *ulim, double *llim, int *nSam, int *ntreeSize);
 
+void drTrees(double *x, int *xrow, int *xcol, int *nrnodes, int *ntree, int *hlim, int *rowSamp, int *nRowSamp, int *colSamp, int *nColSamp, int *nmin,  double *rFactor, double *colWeight, int *nlevels, int *nodeStatus, int *lDaughter, int *rDaughter, int  *splitAtt, unsigned char *battValues, unsigned char *bARattValues, int *nSam, int *ntreeSize);
+
 void rTree(double *x, unsigned long int *xref, int xrow, int xcol,  int nsample,int nrnodes, int hlim, int nmin, double rFactor, bool *AttSkip, int *AttPool, int nColSamp, int *nodeStatus, int *lDaughter, int *rDaughter, int *splitAtt, double *splitPoint, double *ulim, double *llim, int *nSam, int *ntreeSize);
+
+void drTree(double *x, unsigned long int *xref, int xrow, int xcol,  int nsample,int nrnodes, int hlim, int nmin, double rFactor, bool *AttSkip, int *AttPool, int nColSamp, int *nodeStatus, int *lDaughter, int *rDaughter, int *splitAtt, unsigned char *battValues,unsigned char *bARattValues, int *nlevels, int sumnlevels, int maxnlevels, int *nlevelsStart, int *nSam, int *ntreeSize);
 
 void rtDepth(double *x, int *xrow, int *xcol, int *samSize, int *nrnodes, int *ntree, int *hlim, int *nodeStatus, int *lDaughter, int *rDaughter, int  *splitAtt, double *splitPoint, double *ulim, double *llim, int *nSam, int *appRange, double *outF, double *pathLength, int *isoby, double *isoat);
 
@@ -40,6 +44,10 @@ void trvTree(double *x, int xrow, int xcol, int hlim, int *nodeStatus, int *lDau
 void SDGainSplit(double *x, unsigned long int *xref, int xrow, int xcol, int ndStart, int ndEnd, int *splitAtt, double *splitPoint, double *ulim, double *llim, int *ndEndl, bool *AttSkip);
 
 void randomSplit(double *x, unsigned long int *xref, int xrow, int xcol, int ndStart, int ndEnd, int *splitAtt, double *splitPoint, double *ulim, double *llim, int *ndEndl, int *AttPool, int nColSamp);
+
+void drandomSplit(double *x, unsigned long int *xref, int xrow, int xcol, int ndStart, int ndEnd, int *splitAtt, int *ncat, unsigned char *icat, unsigned char *nodecat, unsigned char *lbARnodeValues, unsigned char *rbARnodeValues, unsigned char *lbattValues, unsigned char *rbattValues,unsigned char *lbARattValues,unsigned char *rbARattValues, int sumnlevels, int maxnlevels, int *nlevelsStart, int *nlevels, int *ndEndl, int *AttPool, int nColSamp);
+
+void dminFreqRatioSplit (double *x, unsigned long int *xref, int xrow, int xcol, int ndStart, int ndEnd, int *splitAtt, int *catfreq, unsigned char *nodecat, unsigned char *lbARnodeValues, unsigned char *rbARnodeValues, unsigned char *lbattValues, unsigned char *rbattValues, unsigned char *lbARattValues, unsigned char *rbARattValues, int sumnlevels, int maxnlevels, int *nlevelsStart, int *nlevels, int *ndEndl, bool *AttSkip);
 
 void swapint(int a, int b, int *x);
 
@@ -53,16 +61,48 @@ void Quicksort (int Fp,int Lp,int Att,double *x, unsigned long int *xref, int xr
 
 int SortAndLocate(int Fp, int Lp, int Att, double *x, unsigned long int *xref, int xrow, int xcol, double splitPoint);
 
+int dSortAndLocate(int Fp, int Lp, int Att, double *x, unsigned long int *xref, int xrow, int xcol, unsigned char *licat);
+
 double unif_rand();
 
 //double avgPL(int n);
 
 void zeroInt(int *x, int length);
 
+void zeroUnsignedChar(unsigned char *x, int length);
+
 void zeroDouble(double *x, int length);
+
+void shuffle(int *intArr, int size);
+
+void weightedShuffle(double *colWeight, int *AttPool, int nColSamp, int xcol);
 
 void weightedAttPool(double *colWeight, int *AttPool, int nColSamp, int xcol);
 
+double rtMean(int Fp,int Lp,int Att,double *x, unsigned long int *xref, int xrow, int xcol);
+
+double rtSd(int Fp,int Lp,int Att,double *x, unsigned long int *xref, int xrow, int xcol, double tempMean);
+
+double rtStdMoment(int Fp,int Lp,int Att,double *x, unsigned long int *xref, int xrow, int xcol, int order, double tempMean, double tempSd);
+
+double meanIn (int n, double xi, double Oldmean);
+
+double meanEx (int n, double xi, double Oldmean);
+
+
+int locate(double *x, unsigned long int *xref, int xrow, int sAtt, int xHigh, int xLow, double searchPoint);
+
+double sfunction(double v);
+
+double Gaussian(double v, double a, double b, double c);
+
+unsigned char pack(int nBits, unsigned char *bits);
+
+void unpack(unsigned char pack, unsigned char *bits);
+
+void packAnode(unsigned char *battValues, int sumnlevels, unsigned char *attValues);
+
+void unpackAnode(unsigned char *battValues, int sumnlevels, unsigned char *attValues);
 
 #define NODE_TERMINAL -1
 #define NODE_TOSPLIT  -2

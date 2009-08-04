@@ -23,7 +23,8 @@ AnomalyScore<-function(x, forest, ntree = forest$ntree, hlim = forest$hlim, appR
  if (!inherits(forest,"iForest"))
     stop("forest is not a iForest object")
 
-    fout<-NULL
+
+    rdout<-NULL
 
     if (!is.null(forest$trees))
     {
@@ -37,7 +38,7 @@ AnomalyScore<-function(x, forest, ntree = forest$ntree, hlim = forest$hlim, appR
           xn<-data.matrix(xn)
           storage.mode(xn) <- "double"
 
-          ptime<-system.time( fout<- .C( "rtDepth",
+          ptime<-system.time( rdout<- .C( "rtDepth",
                        x=xn,
                        as.integer(nrowx),
                        as.integer(ncolx),
@@ -60,8 +61,10 @@ AnomalyScore<-function(x, forest, ntree = forest$ntree, hlim = forest$hlim, appR
                        isoat = matrix(double(nrowx*ncolx), ncol=ncolx),
                        DUP=FALSE,
                        PACKAGE = "IsolationForest")[17:20])
-          fout$ptime<-ptime
+          rdout$ptime<-ptime
           rm(xn)
     }
- fout
+
+rdout
+
 }

@@ -76,7 +76,7 @@ void rTrees(double *x, int *xrow, int *xcol, int *nrnodes, int *ntree, int *hlim
 
           for (n=0; n<*nRowSamp ; ++n)
           {
-            ktmp= (int) (*xrow * unif_rand()); /* only shuffle the data in the sample area*/
+            ktmp= (int) (ceil(*xrow * unif_rand())-1); /* only shuffle the data in the sample area*/
               swapUnsignedLongInt(n,ktmp,xref);
           }
       }
@@ -187,9 +187,10 @@ void rTree(double *x, unsigned long int *xref, int xrow, int xcol,  int nsample,
 
 void SDGainSplit (double *x, unsigned long int *xref, int xrow, int xcol, int ndStart, int ndEnd, int *splitAtt, double *splitPoint, double *ulim, double *llim, int *ndEndl, bool *AttSkip)
 {
-   double attMax, attMin, attSplitPoint=0.0, attMaxGain=0.0, maxGain=0.0,  baseSd, leftSd, rightSd,  Gain, base;
-   long double baseOldM=0.0, baseOldQ=0.0, leftOldM=0.0, leftOldQ=0.0,  rightOldM=0.0, rightOldQ=0.0,baseNewM=0.0, baseNewQ=0.0, leftNewM, leftNewQ,  rightNewM, rightNewQ,xvalue;
-   int n, sAtt, maxGainN=0;
+   //double attMax, attMin, attSplitPoint, attMaxGain=0, maxGain,  baseSd, leftSd, rightSd,  baseSum, baseSqSum, leftSum, leftSqSum,  rightSum, rightSqSum,Gain,xvalue;
+   double attMax, attMin, attSplitPoint, attMaxGain=0, maxGain,  baseSd, leftSd, rightSd,  Gain, base;
+   long double baseOldM, baseOldQ, leftOldM, leftOldQ,  rightOldM, rightOldQ,baseNewM, baseNewQ, leftNewM, leftNewQ,  rightNewM, rightNewQ,xvalue;
+   int n, sAtt, maxGainN;
    bool FirstRun = true;
 
 
@@ -259,10 +260,10 @@ void SDGainSplit (double *x, unsigned long int *xref, int xrow, int xcol, int nd
         rightOldQ = rightNewQ;
       }
       base = 2;
-
+      //if (leftSd==0 || rightSd==0) base =1;    // if one of the Sd is zero then base of the average is 1
 
       Gain = (baseSd - (leftSd+rightSd)/base)/baseSd;
-
+       //Rprintf("sAtt %d,baseSd %f, leftSd %f, rightSd %f, rightSum %f, rightSqSum %f, Gain %f\n",sAtt, baseSd, leftSd, rightSd, rightSum, rightSqSum, Gain);
 
        if (Gain >= maxGain || n == ndStart)
        {
@@ -284,15 +285,17 @@ void SDGainSplit (double *x, unsigned long int *xref, int xrow, int xcol, int nd
    }
 
    if (*splitAtt>-1)
+   //quicksort here to restore the ordering of attribute splitAtt
+  // Quicksort( ndStart,ndEnd,(*splitAtt-1), x, xref, xrow, xcol);
    *ndEndl = SortAndLocate(ndStart,ndEnd,(*splitAtt-1), x, xref, xrow, xcol, *splitPoint);
 }
 
 void randomSplit(double *x, unsigned long int *xref, int xrow, int xcol, int ndStart, int ndEnd, int *splitAtt, double *splitPoint, double *ulim, double *llim, int *ndEndl, int *AttPool, int nColSamp)
 {
    double xMax , xMin, *attMax, *attMin, *attSplitPoint;
-
+//   int n, sAtt, xHigh, xLow, sAttIdx, temp;
    int  sAtt, sAttIdx, i,j , *localAttPool;
-
+   //Rprintf("Random Split\n");
    localAttPool = (int *)Calloc(nColSamp, int);
    attMax= (double *)Calloc(xcol, double);
    attMin= (double *)Calloc(xcol, double);
@@ -307,7 +310,10 @@ void randomSplit(double *x, unsigned long int *xref, int xrow, int xcol, int ndS
      }
    for (j=0; j<xcol; j++)
    {
-      attSplitPoint[j] = unif_rand() * (attMax[j] - attMin[j]) + attMin[j];
+      attSplitPoint[j] = (ceil(unif_rand() * RAND_MAX) /RAND_MAX) * (attMax[j] - attMin[j]) + attMin[j];
+      //   (ceil(unif_rand() * RAND_MAX) /RAND_MAX) changes the range to (0,1] instead of [0,1] in unif_rand()
+  //    ulim[j] = attMax[j] + attSplitPoint[j] - attMin[j];
+  //    llim[j] = attMin[j] - (attMax[j] - attSplitPoint[j]);
    }
 
 
@@ -316,8 +322,8 @@ void randomSplit(double *x, unsigned long int *xref, int xrow, int xcol, int ndS
    {
      /* This while loop exhaust other attributes to split,
      if a randomly selected attribute cannot be split, then stop splitting.*/
-     // Randomly select an attribute
-     sAttIdx = (int) floor(unif_rand() * (double) nColSamp);
+     //sAtt = (int) (unif_rand() * xcol); // Randomly select an attribute
+     sAttIdx = (int) (ceil(unif_rand() * (double) nColSamp) - 1);
      sAtt = localAttPool[sAttIdx];
      // if selected attribute is the same as what is being splitted by then select another attribute
      /* sort the cases between ndStart and ndEnd using splitAtt */
@@ -328,6 +334,9 @@ void randomSplit(double *x, unsigned long int *xref, int xrow, int xcol, int ndS
      if (xMax==xMin) {
        // swapping AttPool[sAttIdx] and sAttIdx[nColSamp - 1]
        swapint(sAttIdx,nColSamp - 1, localAttPool);
+/*       temp = localAttPool[sAttIdx];
+       localAttPool[sAttIdx] = localAttPool[nColSamp - 1];
+       localAttPool[nColSamp - 1] = temp;                 */
        nColSamp--; // reducing the pool size
        continue;
      }
@@ -335,6 +344,7 @@ void randomSplit(double *x, unsigned long int *xref, int xrow, int xcol, int ndS
      *splitPoint = attSplitPoint[sAtt];
 
      *ndEndl = SortAndLocate(ndStart,ndEnd,sAtt, x, xref, xrow, xcol, *splitPoint);
+     // Rprintf("n2 = %d, splitpoint: %f, x[n]: %f, x[n+1]: %f\n",n, *splitPoint,x[n+sAtt * xrow], x[n+1+sAtt * xrow] );
      *splitAtt = sAtt + 1;  /* + 1 for indexing in R */
    }
    
@@ -351,6 +361,4 @@ void randomSplit(double *x, unsigned long int *xref, int xrow, int xcol, int ndS
 
 
 }
-
-
 

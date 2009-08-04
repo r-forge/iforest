@@ -44,7 +44,7 @@ void rtDepth(double *x, int *xrow, int *xcol, int *samSize, int *nrnodes, int *n
     for (i=0; i<*xrow ; ++i)
     {
       outF[i] = 1/pow(2,totDepth[i]/(scaleF * (double) *ntree));
-      pathLength[i] = totDepth[i] / (double) *ntree;
+      pathLength[i] =  totDepth[i]/ *ntree;
       for (j=0; j<*xcol ; ++j)
           if (isoby[j* *xrow +i] > 0)  // divide the isoat matrix by the number of times of the attribute is being used
                 isoat[j * *xrow +i] = isoat[j * *xrow +i] /isoby[j* *xrow +i];
@@ -57,8 +57,8 @@ void trvTree(double *x, int xrow, int xcol, int hlim,
              int *rDaughter, int  *splitAtt, double *splitPoint,
              double *ulim, double *llim, int *nSam, int appRange, double *totDepth, int *isoby, double *isoat)
 {
-  int i, k, d,p, sAtt=0;
-  double sVal, lastSplitPoint=0.0;
+  int i, k, d,p,j, sAtt=0;
+  double sVal, lastSplitPoint;
   bool inRange;
 
   for ( i = 0 ;i < xrow; ++i)  {
@@ -70,7 +70,7 @@ void trvTree(double *x, int xrow, int xcol, int hlim,
 
        // 2. Is the value of sAtt within the upper and lower limits of node k?
        sVal = x[i + sAtt * xrow];
-
+  //     isoby[sAtt * xrow + i] ++;
        if (appRange>0)
        {
              inRange=true;
@@ -85,8 +85,9 @@ void trvTree(double *x, int xrow, int xcol, int hlim,
              }
        }
        else
+       
          p++;
-
+         //isoat[sAtt * xrow + i] += splitPoint[k];
 
        d++;
        lastSplitPoint = splitPoint[k];  // capture the last splitpoint before k is reassigned.
@@ -98,8 +99,4 @@ void trvTree(double *x, int xrow, int xcol, int hlim,
     isoat[sAtt * xrow + i]+= lastSplitPoint;
   }
 }
-
-
-
-
 

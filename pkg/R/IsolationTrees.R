@@ -26,7 +26,6 @@ IsolationTrees<-function(x, ntree=10, hlim=as.integer(ceiling(log2(nrow(x)))), r
 #nRowSamp is the instance sub-sampling size; it must be less than or equal to the training sample size
 # colSamp is alogical switch to perform random attribute sub-sampling}
 # nColSamp is the attribute sub-sampling size; it must be less than or equal to the number of attributes
-
 {
      #Trees are implemented as a set of matrices, each row is a tree
      #lDaughter and rDaughter are column pointers to find the respective left and right daughters
@@ -36,7 +35,6 @@ IsolationTrees<-function(x, ntree=10, hlim=as.integer(ceiling(log2(nrow(x)))), r
      #ulim is the upper limit of splitAtt value to which the node applies
      #llim is the lower limit of splitAtt value to which the node applies
      #nSam is the number of samples that the node had.
-
      colWeight<-colWeight
      hlim<-hlim
      nRowSamp<-nRowSamp
@@ -44,7 +42,7 @@ IsolationTrees<-function(x, ntree=10, hlim=as.integer(ceiling(log2(nrow(x)))), r
      rowSamp<-rowSamp
      colSamp<-colSamp
      ntree<-ntree
-     
+
      if (rowSamp && (nRowSamp>= nrow(x))) stop("nRowSamp must be smaller than nrow(x)")
      if (colSamp && (nColSamp>= ncol(x))) stop("nColSamp must be smaller than ncol(x)")
 
@@ -53,28 +51,20 @@ IsolationTrees<-function(x, ntree=10, hlim=as.integer(ceiling(log2(nrow(x)))), r
 
      nrnodes <- min(if(rowSamp) nRowSamp else nrow(x), 2^hlim) * 2 - 1
 
-
      rtout<-NULL
      ptime<-NULL
      colisfactor<-FALSE
-
+     drtout<-NULL
+     dptime<-NULL
      allxcols<-colnames(x)
-     
      if (is.data.frame(x))
      {
         colisfactor<-unlist(lapply(x, is.factor))
         colnlevels<-unlist(lapply(x, nlevels))
-
-        if (any(colisfactor))
-        {
-            print("Factors are not handled in Isolation Forest!")
-
-        }
      }
 
      if (any(!colisfactor))
      {
-
          ncolWeight <- colWeight[!colisfactor]
          xcols<-colnames(x)
          x<-data.matrix(x)
@@ -107,7 +97,6 @@ IsolationTrees<-function(x, ntree=10, hlim=as.integer(ceiling(log2(nrow(x)))), r
                           DUP=FALSE,
                           PACKAGE = "IsolationForest")[2:22])
      }
-
      out<-list(xcols=allxcols,
           trees=rtout,
           ptime=ptime,
@@ -118,5 +107,3 @@ IsolationTrees<-function(x, ntree=10, hlim=as.integer(ceiling(log2(nrow(x)))), r
      class(out)<-"iForest"
      return(out)
 }
-
-

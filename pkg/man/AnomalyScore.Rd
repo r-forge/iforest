@@ -18,8 +18,6 @@ Return anomaly scores and path length of \code{x} according to \code{forest}.
 \value{
 \item{outF}{anomaly scores of samples in \code{x}}
 \item{pathLength}{average path lengths of samples in \code{x}}
-\item{isoby}{counts on the last attributes that isolate samples in \code{x}}
-\item{isoat}{average split points on the last attributes that isolate samples in \code{x}}
 }
 \details{
  \code{AnomalyScore} passes each sample in \code{x} through \code{forest} to obtain expected path length.  It then uses path length and parameter in \code{forest} to determine anomaly score.
